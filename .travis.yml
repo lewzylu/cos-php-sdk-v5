@@ -8,6 +8,7 @@ notifications:
       - fysntian@tencent.com
 
 before_script:
+  - env
   - composer install --prefer-dist --dev --no-interaction
 
 script: 
