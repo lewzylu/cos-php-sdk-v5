@@ -18,6 +18,7 @@ use GuzzleHttp\Command\Exception\CommandException;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Middleware;
 use GuzzleHttp\Psr7;
+use GuzzleHttp\Psr7\Uri;
 
 /**
  * @method object AbortMultipartUpload (array $arg)
@@ -260,6 +261,22 @@ class Client extends GuzzleClient {
             $rt = $multipartUpload->performUploading();
         }
         return $rt;
+    }
+
+    public function upload_with_retry($bucket, $key, $body, $options = array()) {
+        try {
+            $rt = $this->upload($bucket, $key, $body, $options);
+            return $rt;
+        } catch (\Exception $e) {
+            echo($e);
+        }
+        try {
+            $this->cosConfig['domain'] = $options['RetryDomain'];
+            $rt = $this->upload($bucket, $key, $body, $options);
+            return $rt;
+        } catch (\Exception $e) {
+            throw($e);
+        }
     }
 
     public function download($bucket, $key, $saveAs, $options = array()) {
